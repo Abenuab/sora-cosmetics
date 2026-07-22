@@ -10,7 +10,7 @@ export default function Contact() {
       <div className="max-w-xl mx-auto mt-10 space-y-4">
 
         <p>
-          📞 Phone: +251 9XXXXXXXX
+          📞 Phone: +251 996012811
         </p>
 
         <p>

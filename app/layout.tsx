@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import Navbar from "./components/Navbar";
+import { CartProvider } from "@/context/CartContext";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -14,9 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Sora Cosmetics | Premium Beauty Products",
-
-description:
-"Shop skincare, makeup and beauty products from Sora Cosmetics.",
+  description:
+    "Shop skincare, makeup and beauty products from Sora Cosmetics.",
 };
 
 export default function RootLayout({
@@ -29,7 +31,15 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body>
+        <CartProvider>
+          <Navbar />
+
+          {children}
+
+    
+        </CartProvider>
+      </body>
     </html>
   );
 }
