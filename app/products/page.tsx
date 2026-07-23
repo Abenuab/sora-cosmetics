@@ -28,32 +28,20 @@ export default function Products() {
   }, []);
 
 
-  async function getProducts() {
-console.log("SUPABASE URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-   const { data, error } = await supabase
-  .from("products")
-  .select("*")
-  .order("id", {
-    ascending: false,
-  })
-  .limit(100);
+ async function getProducts() {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .order("id", { ascending: false })
+    .limit(100);
 
-console.log("DATA:", data);
-console.log("ERROR:", error);
-
-
-    if (error) {
-      console.log("ERROR:", error.message);
-      return;
-    }
-
-
-    console.log("PRODUCTS:", data);
-
-
-    setProducts(data || []);
-
+  if (error) {
+    console.error(error.message);
+    return;
   }
+
+  setProducts(data || []);
+}
 
 
 
