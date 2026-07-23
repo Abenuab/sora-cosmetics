@@ -5,13 +5,12 @@ import { supabase } from "@/lib/supabase";
 import { useCart } from "@/context/CartContext";
 
 type Product = {
-  id: number;
+  id: number | string;
   name: string;
   price: number;
   image: string;
   category: string;
 };
-
 export default function Products() {
 
   const { addToCart } = useCart();
@@ -28,25 +27,33 @@ export default function Products() {
   }, []);
 
 
- async function getProducts() {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .order("id", { ascending: false })
-    .limit(100);
+  async function getProducts() {
 
-  if (error) {
-    console.error(error.message);
-    return;
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("id", { ascending: false })
+      .limit(100);
+
+
+    if (error) {
+
+      console.error(error.message);
+      return;
+
+    }
+
+
+    setProducts(data || []);
+
   }
-
-  setProducts(data || []);
-}
 
 
 
   const categories = [
+
     "All",
+
     ...Array.from(
       new Set(
         products.map(
@@ -54,18 +61,20 @@ export default function Products() {
         )
       )
     ),
+
   ];
 
 
 
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = products.filter((product)=>{
+
 
     const matchSearch =
       product.name
-        .toLowerCase()
-        .includes(
-          search.toLowerCase()
-        );
+      .toLowerCase()
+      .includes(
+        search.toLowerCase()
+      );
 
 
     const matchCategory =
@@ -74,6 +83,7 @@ export default function Products() {
 
 
     return matchSearch && matchCategory;
+
 
   });
 
@@ -85,8 +95,18 @@ export default function Products() {
 
 
       <h1 className="text-5xl font-bold text-center text-pink-600">
-        Our Products
+
+        Premium Beauty Products
+
       </h1>
+
+
+      <p className="text-center text-gray-500 mt-4">
+
+        Shop skincare, makeup and beauty products from Sora Cosmetics.
+
+      </p>
+
 
 
 
@@ -94,28 +114,42 @@ export default function Products() {
 
 
         <input
+
           type="text"
-          placeholder="Search products..."
+
+          placeholder="Search beauty products..."
+
           value={search}
+
           onChange={(e)=>setSearch(e.target.value)}
+
           className="border p-3 rounded-xl flex-1"
+
         />
 
 
 
         <select
+
           value={selectedCategory}
+
           onChange={(e)=>setSelectedCategory(e.target.value)}
+
           className="border p-3 rounded-xl"
+
         >
+
 
           {categories.map((cat)=>(
 
             <option key={cat}>
+
               {cat}
+
             </option>
 
           ))}
+
 
         </select>
 
@@ -126,80 +160,135 @@ export default function Products() {
 
 
 
+
       <div className="grid md:grid-cols-3 gap-8 mt-12">
 
 
-        {filteredProducts.length === 0 ? (
 
-          <p className="text-center text-gray-500 col-span-3">
-            No products found
-          </p>
-
-        ) : (
-
-          filteredProducts.map((product)=>(
+        {
+          filteredProducts.length === 0 ? (
 
 
-            <div
-              key={product.id}
-              className="rounded-3xl shadow-xl overflow-hidden bg-white dark:bg-gray-900"
-            >
+            <p className="text-center text-gray-500 col-span-3">
 
+              No products found
 
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-80 object-cover"
-              />
+            </p>
 
 
 
-              <div className="p-6">
+          ) : (
 
 
-                <h2 className="text-2xl font-bold">
-                  {product.name}
-                </h2>
+            filteredProducts.map((product)=>(
 
 
+              <div
 
-                <p className="text-gray-500">
-                  {product.category}
-                </p>
+                key={product.id}
 
+                className="rounded-3xl shadow-xl overflow-hidden bg-white dark:bg-gray-900"
 
-
-                <p className="text-pink-600 text-xl mt-3">
-                  ${product.price}
-                </p>
+              >
 
 
 
-                <button
-                  onClick={() =>
-                    addToCart({
-                      ...product,
-                      quantity: 1,
-                    })
-                  }
-                  className="mt-5 w-full bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700"
-                >
-                  Add to Cart
-                </button>
+                <img
+
+                  src={product.image}
+
+                  alt={`${product.name} - Sora Cosmetics beauty product`}
+
+                  loading="lazy"
+
+                  className="w-full h-80 object-cover"
+
+                />
+
+
+
+
+
+                <div className="p-6">
+
+
+
+                  <h2 className="text-2xl font-bold">
+
+                    {product.name}
+
+                  </h2>
+
+
+
+
+                  <p className="text-gray-500">
+
+                    {product.category}
+
+                  </p>
+
+
+
+
+                  <p className="text-gray-600 mt-3">
+
+                    Premium quality {product.category} product from Sora Cosmetics.
+
+                  </p>
+
+
+
+
+
+                  <p className="text-pink-600 text-xl mt-3 font-bold">
+
+                    ${product.price}
+
+                  </p>
+
+
+
+
+<button
+  onClick={() => {
+
+    console.log("ADDING:", product);
+
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: Number(product.price),
+      image: product.image,
+      category: product.category,
+      quantity: 1,
+    });
+
+  }}
+  className="mt-5 w-full bg-pink-600 text-white py-3 rounded-xl"
+>
+  Add to Cart
+</button>
+
+
+                </div>
+
 
 
               </div>
 
 
-            </div>
 
+            ))
 
-          ))
+          )
 
-        )}
+        }
+
 
 
       </div>
+
 
 
     </main>

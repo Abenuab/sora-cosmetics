@@ -9,15 +9,14 @@ import { supabase } from "@/lib/supabase";
 export default function CheckoutPage() {
 
   const { cart, clearCart } = useCart();
-console.log("CHECKOUT CART:", cart);
+
   const router = useRouter();
+
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
-
-  const [txRef, setTxRef] = useState("");
 
   const [userChecked, setUserChecked] = useState(false);
 
@@ -52,7 +51,9 @@ console.log("CHECKOUT CART:", cart);
 
     checkUser();
 
+
   }, [router]);
+
 
 
 
@@ -64,7 +65,19 @@ console.log("CHECKOUT CART:", cart);
 
 
 
+
+
   const handlePayment = async () => {
+
+
+    if (cart.length === 0) {
+
+      alert("Your cart is empty");
+
+      return;
+
+    }
+
 
 
     if (!name || !phone || !address) {
@@ -76,13 +89,10 @@ console.log("CHECKOUT CART:", cart);
     }
 
 
-    const newTxRef = "sora-" + Date.now();
 
-    setTxRef(newTxRef);
-
+    const txRef = "sora-" + Date.now();
 
 
-    // Create order first
 
     const {
       data: { user },
@@ -100,25 +110,53 @@ console.log("CHECKOUT CART:", cart);
 
 
 
+
+
+    console.log("ORDER USER:", user.email);
+
+    console.log("ORDER DATA:", {
+      total,
+      email:user.email
+    });
+
+
+
+
+
+    // Save order
+
     const { error } = await supabase
       .from("orders")
       .insert([
+
         {
-          customer_name: name,
-          phone: phone,
-          address: address,
-          products: cart,
-          total: total,
-          customer_email: user.email,
-          status: "Pending",
-          payment_status: "Pending",
-          tx_ref: newTxRef,
-        },
+
+          customer_name:name,
+
+          phone:phone,
+
+          address:address,
+
+          products:cart,
+
+          total:total,
+
+          customer_email:user.email,
+
+          status:"Pending",
+
+          payment_status:"Pending",
+
+          tx_ref:txRef,
+
+        }
+
       ]);
 
 
 
-    if (error) {
+
+    if(error){
 
       console.log("ORDER ERROR:", error);
 
@@ -129,32 +167,59 @@ console.log("CHECKOUT CART:", cart);
     }
 
 
-console.log("Cart:", cart);
-console.log("Total:", total);
-    const res = await fetch("/api/chapa", {
 
-      method: "POST",
 
-      headers: {
-        "Content-Type": "application/json",
+
+    console.log("CHAPA REQUEST:",{
+
+      amount:total,
+
+      email:user.email,
+
+      first_name:name,
+
+      phone:phone,
+
+      tx_ref:txRef,
+
+    });
+
+
+
+
+
+
+    const res = await fetch("/api/chapa",{
+
+
+      method:"POST",
+
+
+      headers:{
+
+        "Content-Type":"application/json",
+
       },
 
 
-      body: JSON.stringify({
+      body:JSON.stringify({
 
-        amount: total,
+        amount:total,
 
-        email: email,
+        email:user.email,
 
-        first_name: name,
+        first_name:name,
 
-        phone: phone,
+        phone:phone,
 
-        tx_ref: newTxRef,
+        tx_ref:txRef,
 
       }),
 
+
     });
+
+
 
 
 
@@ -162,27 +227,30 @@ console.log("Total:", total);
 
 
 
-    console.log(data);
+    console.log("CHAPA RESPONSE:",data);
 
 
 
-    if (data.status === "success") {
+
+
+
+    if(data.status === "success"){
 
 
       window.location.href =
-        data.data.checkout_url;
+      data.data.checkout_url;
 
 
-    } else {
+    }
+
+    else{
 
 
       alert("Payment initialization failed");
 
 
-      console.log(data);
-
-
     }
+
 
 
   };
@@ -190,7 +258,10 @@ console.log("Total:", total);
 
 
 
-  if (!userChecked) {
+
+
+
+  if(!userChecked){
 
     return (
 
@@ -207,6 +278,7 @@ console.log("Total:", total);
 
 
 
+
   return (
 
     <div className="p-8 max-w-xl mx-auto">
@@ -219,43 +291,69 @@ console.log("Total:", total);
 
 
       <input
+
         className="w-full border p-3 rounded mb-4"
+
         placeholder="Full Name"
+
         value={name}
+
         onChange={(e)=>setName(e.target.value)}
+
       />
+
 
 
 
       <input
+
         className="w-full border p-3 rounded mb-4"
+
         placeholder="Phone Number"
+
         value={phone}
+
         onChange={(e)=>setPhone(e.target.value)}
+
       />
+
 
 
 
       <textarea
+
         className="w-full border p-3 rounded mb-4"
+
         placeholder="Address"
+
         value={address}
+
         onChange={(e)=>setAddress(e.target.value)}
+
       />
 
 
 
+
       <h2 className="text-xl font-bold mb-4">
+
         Total: ${total}
+
       </h2>
 
 
 
+
       <button
+
         onClick={handlePayment}
+
         className="w-full bg-pink-600 text-white p-3 rounded-xl"
+
       >
+
         Pay with Chapa
+
       </button>
 
 

@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useState,
+  useEffect,
   ReactNode,
 } from "react";
 
@@ -15,7 +16,6 @@ type Product = {
   category?: string;
   quantity: number;
 };
-
 
 type CartContextType = {
   cart: Product[];
@@ -34,11 +34,9 @@ type CartContextType = {
   clearCart: () => void;
 };
 
-
 const CartContext = createContext<CartContextType | undefined>(
   undefined
 );
-
 
 export function CartProvider({
   children,
@@ -48,7 +46,22 @@ export function CartProvider({
 
   const [cart, setCart] = useState<Product[]>([]);
 
+  // Load cart from localStorage
+  useEffect(() => {
+    const savedCart = localStorage.getItem("cart");
 
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+  }, []);
+
+  // Save cart whenever it changes
+  useEffect(() => {
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(cart)
+    );
+  }, [cart]);
 
   // Add product
   const addToCart = (product: Product) => {
@@ -58,7 +71,6 @@ export function CartProvider({
       const exists = oldCart.find(
         (item) => item.id === product.id
       );
-
 
       if (exists) {
 
@@ -73,7 +85,6 @@ export function CartProvider({
 
       }
 
-
       return [
         ...oldCart,
         {
@@ -85,8 +96,6 @@ export function CartProvider({
     });
 
   };
-
-
 
   // Update quantity
   const updateQuantity = (
@@ -108,8 +117,6 @@ export function CartProvider({
 
   };
 
-
-
   // Remove product
   const removeFromCart = (
     id: number | string
@@ -123,16 +130,14 @@ export function CartProvider({
 
   };
 
-
-
-  // Clear cart after successful order
+  // Clear cart
   const clearCart = () => {
 
     setCart([]);
 
+    localStorage.removeItem("cart");
+
   };
-
-
 
   return (
 
@@ -154,13 +159,9 @@ export function CartProvider({
 
 }
 
-
-
-
 export function useCart() {
 
   const context = useContext(CartContext);
-
 
   if (!context) {
 
@@ -169,7 +170,6 @@ export function useCart() {
     );
 
   }
-
 
   return context;
 
