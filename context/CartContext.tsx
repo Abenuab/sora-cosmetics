@@ -8,6 +8,7 @@ import {
   ReactNode,
 } from "react";
 
+
 type Product = {
   id: number | string;
   name: string;
@@ -17,121 +18,188 @@ type Product = {
   quantity: number;
 };
 
+
+
 type CartContextType = {
+
   cart: Product[];
 
-  addToCart: (product: Product) => void;
+  addToCart:(product:Product)=>void;
 
-  updateQuantity: (
-    id: number | string,
-    quantity: number
-  ) => void;
+  updateQuantity:(id:number|string, quantity:number)=>void;
 
-  removeFromCart: (
-    id: number | string
-  ) => void;
+  removeFromCart:(id:number|string)=>void;
 
-  clearCart: () => void;
+  clearCart:()=>void;
+
 };
 
-const CartContext = createContext<CartContextType | undefined>(
-  undefined
-);
+
+
+const CartContext = createContext<CartContextType | undefined>(undefined);
+
+
+
+
 
 export function CartProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+  children
+}:{
+  children:ReactNode
+}){
 
-  const [cart, setCart] = useState<Product[]>([]);
 
-  // Load cart from localStorage
-  useEffect(() => {
+  const [cart,setCart] = useState<Product[]>([]);
+
+
+
+  // Load cart
+  useEffect(()=>{
+
     const savedCart = localStorage.getItem("cart");
 
-    if (savedCart) {
-      setCart(JSON.parse(savedCart));
-    }
-  }, []);
+    if(savedCart){
 
-  // Save cart whenever it changes
-  useEffect(() => {
+      setCart(JSON.parse(savedCart));
+
+    }
+
+  },[]);
+
+
+
+
+
+  // Save cart
+  useEffect(()=>{
+
     localStorage.setItem(
       "cart",
       JSON.stringify(cart)
     );
-  }, [cart]);
 
-  // Add product
-  const addToCart = (product: Product) => {
+  },[cart]);
 
-    setCart((oldCart) => {
+
+
+
+
+
+
+  const addToCart = (product:Product)=>{
+
+
+    setCart((oldCart)=>{
+
 
       const exists = oldCart.find(
-        (item) => item.id === product.id
+        item=>item.id === product.id
       );
 
-      if (exists) {
 
-        return oldCart.map((item) =>
+
+      if(exists){
+
+
+        return oldCart.map(item=>
+
           item.id === product.id
-            ? {
-                ...item,
-                quantity: item.quantity + 1,
-              }
-            : item
+
+          ?
+
+          {
+            ...item,
+            quantity:item.quantity + 1
+          }
+
+          :
+
+          item
+
         );
 
       }
 
+
+
       return [
+
         ...oldCart,
+
         {
           ...product,
-          quantity: 1,
-        },
+          quantity:1
+        }
+
       ];
 
     });
 
+
   };
 
-  // Update quantity
+
+
+
+
+
   const updateQuantity = (
-    id: number | string,
-    quantity: number
-  ) => {
+    id:number|string,
+    quantity:number
+  )=>{
 
-    setCart((oldCart) =>
-      oldCart.map((item) =>
+
+    setCart(oldCart=>
+
+      oldCart.map(item=>
+
         item.id === id
-          ? {
-              ...item,
-              quantity:
-                quantity < 1 ? 1 : quantity,
-            }
-          : item
+
+        ?
+
+        {
+          ...item,
+          quantity: quantity < 1 ? 1 : quantity
+        }
+
+        :
+
+        item
+
       )
+
     );
+
 
   };
 
-  // Remove product
+
+
+
+
+
   const removeFromCart = (
-    id: number | string
-  ) => {
+    id:number|string
+  )=>{
 
-    setCart((oldCart) =>
+
+    setCart(oldCart=>
+
       oldCart.filter(
-        (item) => item.id !== id
+        item=>item.id !== id
       )
+
     );
+
 
   };
 
-  // Clear cart
-  const clearCart = () => {
+
+
+
+
+
+  const clearCart = ()=>{
 
     setCart([]);
 
@@ -139,16 +207,29 @@ export function CartProvider({
 
   };
 
+
+
+
+
+
   return (
 
     <CartContext.Provider
+
       value={{
+
         cart,
+
         addToCart,
+
         updateQuantity,
+
         removeFromCart,
+
         clearCart,
+
       }}
+
     >
 
       {children}
@@ -157,19 +238,28 @@ export function CartProvider({
 
   );
 
+
 }
 
-export function useCart() {
+
+
+
+
+
+
+export function useCart(){
 
   const context = useContext(CartContext);
 
-  if (!context) {
+
+  if(!context){
 
     throw new Error(
       "useCart must be inside CartProvider"
     );
 
   }
+
 
   return context;
 

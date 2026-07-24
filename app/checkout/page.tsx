@@ -234,15 +234,14 @@ export default function CheckoutPage() {
 
 
 
-    if(data.status === "success"){
+   if(data.status === "success"){
 
+  clearCart();
 
-      window.location.href =
-      data.data.checkout_url;
+  window.location.href =
+  data.data.checkout_url;
 
-
-    }
-
+}
     else{
 
 
