@@ -6,1140 +6,574 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useCart } from "@/context/CartContext";
 import { Montserrat } from "next/font/google";
+
 const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
 });
 
 type Product = {
-  id:number | string;
-  name:string;
-  price:number;
-  image:string;
-  category?:string;
+  id: number | string;
+  name: string;
+  price: number;
+  image: string;
+  category?: string;
 };
 
-
-export default function Home(){
-
+export default function Home() {
   const { addToCart } = useCart();
 
-  const [products,setProducts] = useState<Product[]>([]);
-const [newProducts, setNewProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [newProducts, setNewProducts] = useState<Product[]>([]);
 
- useEffect(()=>{
-
-  loadProducts();
-  loadNewProducts();
-
-},[]);
-
+  useEffect(() => {
+    loadProducts();
+    loadNewProducts();
+  }, []);
 
   async function loadProducts() {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("featured", true)
-    .limit(4);
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("featured", true)
+      .limit(4);
 
-  if (error) {
-    console.error(error);
-    return;
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setProducts(data || []);
   }
 
-  setProducts(data || []);
-}
-async function loadNewProducts(){
+  async function loadNewProducts() {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("id", { ascending: false })
+      .limit(4);
 
-  const {data,error}= await supabase
-    .from("products")
-    .select("*")
-    .order("id", { ascending:false })
-    .limit(4);
+    console.log("NEW PRODUCTS:", data);
 
-console.log("NEW PRODUCTS:", data);
-  if(!error && data){
-
-    setNewProducts(data);
-
+    if (!error && data) {
+      setNewProducts(data);
+    }
   }
 
-}
+  return (
+    <main className="min-h-screen bg-[#f5efe9] text-[#211d1b]">
 
+      {/* =====================================================
+          HERO
+      ===================================================== */}
 
-return (
+      <section className="relative overflow-hidden bg-[#211d1b] text-white">
 
-<main className="
-min-h-screen
-bg-gradient-to-b
-from-pink-50
-via-white
-to-pink-100
-dark:from-gray-950
-dark:via-gray-900
-dark:to-black
-">
+        {/* Decorative circles */}
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[#b98579]/20 blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[#d8b7a8]/10 blur-3xl" />
 
+        <div className="relative z-10 mx-auto grid min-h-[88vh] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-2">
 
-{/* ================= PREMIUM HERO ================= */}
+          {/* LEFT */}
 
-<section className="
-relative
-overflow-hidden
-min-h-[90vh]
-flex
-items-center
-">
+          <div>
 
-{/* Background */}
+            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold tracking-wide text-[#f2d9ce] backdrop-blur-md">
+              ✨ PREMIUM BEAUTY COLLECTION
+            </div>
 
-<div className="
-absolute
-inset-0
-bg-gradient-to-br
-from-pink-100
-via-white
-to-purple-100
-dark:from-gray-950
-dark:via-gray-900
-dark:to-black
-">
+            <h1
+              className={`${montserrat.className} text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-8xl`}
+            >
+              Reveal Your
 
+              <span className="mt-2 block text-[#d9a99b]">
+                Natural Beauty
+              </span>
 
-</div>
+              <span className="mt-2 block text-white">
+                With Sora
+              </span>
+            </h1>
 
+            <p className="mt-8 max-w-xl text-lg leading-8 text-[#d5ccc7] sm:text-xl">
+              Premium skincare and cosmetics created to enhance your
+              confidence, beauty and everyday self-care routine.
+            </p>
 
+            {/* Buttons */}
 
-<div className="
-absolute
-top-20
-right-20
-w-72
-h-72
-bg-pink-300
-rounded-full
-blur-3xl
-opacity-30
-animate-pulse
-">
+            <div className="mt-10 flex flex-wrap gap-4">
 
+              <Link
+                href="/products"
+                className="rounded-full bg-[#c58f82] px-8 py-4 font-bold text-white shadow-lg transition duration-300 hover:-translate-y-1 hover:bg-[#b77e70]"
+              >
+                Shop Collection →
+              </Link>
 
-</div>
+              <Link
+                href="/cart"
+                className="rounded-full border border-white/40 bg-white/5 px-8 py-4 font-bold text-white backdrop-blur transition duration-300 hover:bg-white hover:text-[#211d1b]"
+              >
+                View Cart 🛒
+              </Link>
 
+            </div>
 
+            {/* Stats */}
 
-<div className="
-absolute
-bottom-10
-left-20
-w-60
-h-60
-bg-purple-300
-rounded-full
-blur-3xl
-opacity-20
-">
+            <div className="mt-14 grid max-w-lg grid-cols-3 gap-6 border-t border-white/15 pt-8">
 
+              <div>
+                <h3 className="text-3xl font-extrabold text-[#d9a99b]">
+                  100+
+                </h3>
+                <p className="mt-1 text-sm text-[#bdb3ae]">
+                  Happy Clients
+                </p>
+              </div>
 
-</div>
+              <div>
+                <h3 className="text-3xl font-extrabold text-[#d9a99b]">
+                  50+
+                </h3>
+                <p className="mt-1 text-sm text-[#bdb3ae]">
+                  Products
+                </p>
+              </div>
 
+              <div>
+                <h3 className="text-3xl font-extrabold text-[#d9a99b]">
+                  5★
+                </h3>
+                <p className="mt-1 text-sm text-[#bdb3ae]">
+                  Reviews
+                </p>
+              </div>
 
+            </div>
 
+          </div>
 
+          {/* RIGHT IMAGE */}
 
-<div className="
-relative
-z-10
-max-w-7xl
-mx-auto
-px-6
-py-20
-grid
-lg:grid-cols-2
-gap-16
-items-center
-">
+          <div className="relative flex justify-center lg:justify-end">
 
+            <div className="absolute h-[420px] w-[420px] rounded-full bg-[#c58f82]/20 blur-3xl" />
 
-{/* LEFT CONTENT */}
+            <div className="relative w-full max-w-[520px] rounded-[40px] border border-white/10 bg-white/10 p-4 shadow-2xl backdrop-blur-sm">
 
+              <Image
+                src="/images/cream.jpg"
+                alt="Sora Cosmetics"
+                width={550}
+                height={650}
+                priority
+                className="h-[520px] w-full rounded-[32px] object-cover"
+              />
 
-<div>
+              {/* Floating badge */}
 
+              <div className="absolute bottom-8 left-8 rounded-2xl border border-white/20 bg-[#211d1b]/85 px-5 py-4 shadow-xl backdrop-blur-md">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#c9bbb5]">
+                  Sora Cosmetics
+                </p>
 
-<div className="
-inline-flex
-items-center
-gap-2
-bg-white/70
-dark:bg-gray-800/70
-backdrop-blur
-px-5
-py-3
-rounded-full
-shadow-lg
-text-pink-600
-font-bold
-">
+                <p className="mt-1 text-lg font-semibold text-white">
+                  Beauty, Naturally.
+                </p>
+              </div>
 
-✨ #1 Beauty Collection
+            </div>
 
+          </div>
 
-</div>
+        </div>
+      </section>
 
 
+      {/* =====================================================
+          FEATURED PRODUCTS
+      ===================================================== */}
 
-<h1
-className={`${montserrat.className} mt-8 text-6xl lg:text-8xl font-extrabold leading-tight tracking-tight`}
->
-  Reveal Your
+      <section className="bg-[#f5efe9] px-6 py-24">
 
-  <span className="
-  block
-  text-pink-600
-  italic
-  ">
-    Natural Beauty
-  </span>
+        <div className="mx-auto max-w-7xl">
 
-  With Sora 
+          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
 
-</h1>
+            <div>
 
+              <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-[#a4776b]">
+                Sora Selection
+              </p>
 
+              <h2 className="text-4xl font-bold text-[#211d1b] sm:text-5xl">
+                Featured Products
+              </h2>
 
-<p className="
-mt-8
-text-xl
-leading-9
-text-gray-600
-dark:text-gray-300
-max-w-xl
-">
+              <p className="mt-4 max-w-xl text-lg text-[#665d58]">
+                Discover some of our most loved beauty products, carefully
+                selected for your everyday beauty routine.
+              </p>
 
-Premium skincare and cosmetics created
-to enhance your confidence, beauty and
-daily self-care routine.
+            </div>
 
-</p>
+            <Link
+              href="/products"
+              className="font-bold text-[#9b685c] transition hover:text-[#6f473f]"
+            >
+              View All Products →
+            </Link>
 
+          </div>
 
 
+          <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
 
+            {products.map((product) => (
 
-<div className="
-flex
-flex-wrap
-gap-5
-mt-10
-">
+              <div
+                key={product.id}
+                className="group overflow-hidden rounded-[28px] border border-[#e3d8d1] bg-[#fffaf7] shadow-[0_10px_35px_rgba(70,50,40,0.08)] transition duration-300 hover:-translate-y-2 hover:shadow-[0_20px_45px_rgba(70,50,40,0.15)]"
+              >
 
+                <div className="overflow-hidden bg-[#eee3dc]">
 
-<Link
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-72 w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
 
-href="/products"
+                </div>
 
-className="
-bg-pink-600
-hover:bg-pink-700
-text-white
-px-10
-py-4
-rounded-2xl
-font-bold
-shadow-xl
-hover:scale-105
-transition
-"
+                <div className="p-6">
 
->
+                  {product.category && (
+                    <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#a4776b]">
+                      {product.category}
+                    </p>
+                  )}
 
-Shop Collection 🛍️
+                  <h3 className="mt-2 text-xl font-bold text-[#211d1b]">
+                    {product.name}
+                  </h3>
 
-</Link>
+                  <p className="mt-3 text-xl font-bold text-[#9b685c]">
+                    ETB {Number(product.price).toFixed(2)}
+                  </p>
 
+                  <button
+                    onClick={() =>
+                      addToCart({
+                        ...product,
+                        price: Number(product.price),
+                        quantity: 1,
+                      })
+                    }
+                    className="mt-5 w-full rounded-xl bg-[#211d1b] py-3 font-semibold text-white transition hover:bg-[#9b685c]"
+                  >
+                    Add To Cart 🛒
+                  </button>
 
+                </div>
 
-<Link
+              </div>
 
-href="/cart"
+            ))}
 
-className="
-border-2
-border-pink-600
-text-pink-600
-px-10
-py-4
-rounded-2xl
-font-bold
-hover:bg-pink-600
-hover:text-white
-transition
-"
+          </div>
 
->
+        </div>
+      </section>
 
-My Cart 🛒
 
-</Link>
+      {/* =====================================================
+          NEW ARRIVALS
+      ===================================================== */}
 
+      <section className="bg-[#e9ddd5] px-6 py-24">
 
-</div>
+        <div className="mx-auto max-w-7xl">
 
+          <div className="text-center">
 
+            <p className="text-sm font-bold uppercase tracking-[0.25em] text-[#95665b]">
+              Just In
+            </p>
 
+            <h2 className="mt-3 text-4xl font-bold text-[#211d1b] sm:text-5xl">
+              New Arrivals ✨
+            </h2>
 
+            <p className="mx-auto mt-4 max-w-xl text-lg text-[#665d58]">
+              Explore the latest products added to Sora Cosmetics.
+            </p>
 
-<div className="
-grid
-grid-cols-3
-gap-6
-mt-14
-">
+          </div>
 
 
-<div>
+          <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
 
-<h3 className="
-text-3xl
-font-black
-text-pink-600
-">
+            {newProducts.map((product) => (
 
-100+
+              <div
+                key={product.id}
+                className="group overflow-hidden rounded-[28px] border border-[#d7c8c0] bg-[#fffaf7] shadow-lg transition duration-300 hover:-translate-y-2"
+              >
 
-</h3>
+                <div className="relative overflow-hidden">
 
-<p className="text-gray-500">
-Happy Clients
-</p>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-72 w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
 
-</div>
+                  <span className="absolute left-4 top-4 rounded-full bg-[#211d1b] px-4 py-2 text-xs font-bold tracking-wider text-white">
+                    NEW
+                  </span>
 
+                </div>
 
+                <div className="p-6">
 
-<div>
+                  {product.category && (
+                    <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#a4776b]">
+                      {product.category}
+                    </p>
+                  )}
 
-<h3 className="
-text-3xl
-font-black
-text-pink-600
-">
+                  <h3 className="mt-2 text-xl font-bold text-[#211d1b]">
+                    {product.name}
+                  </h3>
 
-50+
+                  <p className="mt-3 text-xl font-bold text-[#9b685c]">
+                    ETB {Number(product.price).toFixed(2)}
+                  </p>
 
-</h3>
+                </div>
 
-<p className="text-gray-500">
-Products
-</p>
+              </div>
 
-</div>
+            ))}
 
+          </div>
 
+        </div>
+      </section>
 
-<div>
 
-<h3 className="
-text-3xl
-font-black
-text-pink-600
-">
+      {/* =====================================================
+          BEAUTY GALLERY
+      ===================================================== */}
 
-5★
+      <section className="bg-[#211d1b] px-6 py-24 text-white">
 
-</h3>
+        <div className="mx-auto max-w-7xl">
 
-<p className="text-gray-500">
-Reviews
-</p>
+          <div className="text-center">
 
-</div>
+            <p className="text-sm font-bold uppercase tracking-[0.25em] text-[#d1a397]">
+              Our World
+            </p>
 
+            <h2 className="mt-3 text-4xl font-bold text-white sm:text-5xl">
+              Beauty Gallery 📸
+            </h2>
 
+            <p className="mx-auto mt-4 max-w-xl text-[#c5bbb6]">
+              A glimpse into the beauty and elegance behind Sora Cosmetics.
+            </p>
 
-</div>
+          </div>
 
 
+          <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-4">
 
-</div>
+            {[
+              "/images/2.jpg",
+              "/images/3.jpg",
+              "/images/4.jpg",
+              "/images/cream.jpg",
+            ].map((img) => (
 
+              <div
+                key={img}
+                className="group overflow-hidden rounded-[28px] border border-white/10 shadow-xl"
+              >
 
+                <img
+                  src={img}
+                  alt="Sora Beauty"
+                  className="h-64 w-full object-cover transition duration-700 group-hover:scale-110"
+                />
 
+              </div>
 
+            ))}
 
+          </div>
 
+        </div>
+      </section>
 
-{/* RIGHT IMAGE */}
 
+      {/* =====================================================
+          WHY SORA
+      ===================================================== */}
 
-<div className="
-relative
-flex
-justify-center
-">
+      <section className="bg-[#f5efe9] px-6 py-24">
 
+        <div className="mx-auto max-w-7xl">
 
-<div className="
-absolute
-w-[420px]
-h-[420px]
-rounded-full
-bg-gradient-to-r
-from-pink-300
-to-purple-300
-blur-3xl
-opacity-40
-">
+          <div className="mb-12 text-center">
 
+            <p className="text-sm font-bold uppercase tracking-[0.25em] text-[#a4776b]">
+              The Sora Difference
+            </p>
 
-</div>
+            <h2 className="mt-3 text-4xl font-bold text-[#211d1b] sm:text-5xl">
+              Why Choose Sora?
+            </h2>
 
+          </div>
 
 
-<div className="
-relative
-bg-white/40
-dark:bg-gray-800/40
-backdrop-blur-xl
-p-6
-rounded-[50px]
-shadow-2xl
-animate-bounce
-[animation-duration:4s]
-">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
+            {[
+              ["🚚", "Fast Delivery", "Quick and reliable delivery"],
+              ["🔒", "Secure Payment", "Safe Chapa checkout"],
+              ["🌿", "Premium Quality", "Carefully selected products"],
+              ["⭐", "Trusted Brand", "Customer satisfaction"],
+            ].map((item) => (
 
-<Image
+              <div
+                key={item[1]}
+                className="rounded-[28px] border border-[#e0d3cb] bg-[#fffaf7] p-8 text-center shadow-sm transition duration-300 hover:-translate-y-2 hover:shadow-xl"
+              >
 
-src="/images/cream.jpg"
+                <div className="text-5xl">
+                  {item[0]}
+                </div>
 
-alt="Sora Cosmetics"
+                <h3 className="mt-5 text-xl font-bold text-[#211d1b]">
+                  {item[1]}
+                </h3>
 
-width={550}
+                <p className="mt-3 text-[#6d625d]">
+                  {item[2]}
+                </p>
 
-height={650}
+              </div>
 
-priority
+            ))}
 
-className="
-rounded-[40px]
-object-cover
-shadow-2xl
-"
+          </div>
 
-/>
+        </div>
+      </section>
 
 
-</div>
+      {/* =====================================================
+          TESTIMONIALS
+      ===================================================== */}
 
+      <section className="bg-[#eee2da] px-6 py-24">
 
+        <div className="mx-auto max-w-6xl">
 
-</div>
+          <div className="text-center">
 
+            <p className="text-sm font-bold uppercase tracking-[0.25em] text-[#a4776b]">
+              Customer Stories
+            </p>
 
-</div>
+            <h2 className="mt-3 text-4xl font-bold text-[#211d1b] sm:text-5xl">
+              Customer Love 💖
+            </h2>
 
+          </div>
 
-</section>
-{/* ================= FEATURED PRODUCTS ================= */}
 
-<section className="
-max-w-7xl
-mx-auto
-px-6
-py-20
-">
+          <div className="mt-12 grid gap-7 md:grid-cols-3">
 
+            {[
+              "Beautiful products and amazing quality ⭐⭐⭐⭐⭐",
+              "Fast delivery and excellent service ⭐⭐⭐⭐⭐",
+              "My favorite cosmetics store ⭐⭐⭐⭐⭐",
+            ].map((review) => (
 
-<div className="text-center">
+              <div
+                key={review}
+                className="rounded-[28px] border border-[#dccbc2] bg-[#fffaf7] p-8 text-center shadow-sm"
+              >
 
-<h2 className="
-text-4xl
-font-bold
-">
+                <div className="mb-5 text-2xl text-[#b27c70]">
+                  “
+                </div>
 
-Featured Products 
+                <p className="text-lg leading-8 text-[#403936]">
+                  {review}
+                </p>
 
-</h2>
+                <div className="mt-6 text-sm font-semibold uppercase tracking-wider text-[#9b685c]">
+                  Verified Customer
+                </div>
 
+              </div>
 
-<p className="
-text-gray-500
-mt-4
-text-lg
-">
+            ))}
 
-Our most loved beauty products
+          </div>
 
-</p>
+        </div>
+      </section>
 
 
-</div>
+      {/* =====================================================
+          NEWSLETTER
+      ===================================================== */}
 
+      <section className="bg-[#211d1b] px-6 py-24 text-white">
 
+        <div className="mx-auto max-w-4xl text-center">
 
-<div className="
-grid
-md:grid-cols-4
-gap-8
-mt-12
-">
+          <p className="text-sm font-bold uppercase tracking-[0.25em] text-[#d1a397]">
+            Stay Connected
+          </p>
 
+          <h2 className="mt-3 text-4xl font-bold text-white sm:text-5xl">
+            Stay Beautiful With Sora ✨
+          </h2>
 
-{
-products.map((product)=>(
+          <p className="mx-auto mt-5 max-w-xl text-lg text-[#c8beb9]">
+            Get updates about new products, beauty tips and special offers.
+          </p>
 
 
-<div
-key={product.id}
-className="
-bg-white
-dark:bg-gray-900
-rounded-3xl
-shadow-xl
-overflow-hidden
-hover:-translate-y-2
-transition
-"
->
+          <div className="mx-auto mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row">
 
+            <input
+              placeholder="Enter your email address"
+              className="min-h-14 flex-1 rounded-xl border border-white/15 bg-white/10 px-5 text-white outline-none placeholder:text-[#a99f9a] focus:border-[#c58f82]"
+            />
 
-<img
+            <button
+              className="min-h-14 rounded-xl bg-[#c58f82] px-8 font-bold text-white transition hover:bg-[#b77e70]"
+            >
+              Subscribe
+            </button>
 
-src={product.image}
+          </div>
 
-alt={product.name}
+        </div>
+      </section>
 
-className="
-w-full
-h-72
-object-cover
-"
-
-/>
-
-
-<div className="p-6">
-
-
-<h3 className="
-text-xl
-font-bold
-">
-
-{product.name}
-
-</h3>
-
-
-
-<p className="
-text-pink-600
-font-bold
-text-2xl
-mt-3
-">
-
-${product.price}
-
-</p>
-
-
-
-<button
-
-onClick={()=>addToCart({
-
-...product,
-
-quantity:1
-
-})}
-
-className="
-mt-5
-w-full
-bg-pink-600
-text-white
-py-3
-rounded-xl
-hover:bg-pink-700
-transition
-"
-
->
-
-Add To Cart 🛒
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-))
-
-}
-
-
-</div>
-
-
-<Link
-
-href="/products"
-
-className="
-block
-text-center
-mt-12
-text-pink-600
-font-bold
-text-xl
-"
-
->
-
-View All Products →
-
-</Link>
-
-
-</section>
-
-{/* ================= NEW ARRIVALS ================= */}
-
-<section className="
-max-w-7xl
-mx-auto
-px-6
-py-20
-">
-
-
-<div className="text-center">
-
-<h2 className="
-text-4xl
-font-bold
-">
-
-New Arrivals ✨
-
-</h2>
-
-
-<p className="
-text-gray-500
-mt-4
-text-lg
-">
-
-Latest products added to Sora Beauty
-
-</p>
-
-</div>
-
-
-
-<div className="
-grid
-md:grid-cols-4
-gap-8
-mt-12
-">
-
-
-{
-
-newProducts.map((product)=>(
-
-
-<div
-key={product.id}
-className="
-bg-white
-dark:bg-gray-900
-rounded-3xl
-shadow-xl
-overflow-hidden
-hover:-translate-y-2
-transition
-"
->
-
-
-<div className="relative">
-
-
-<img
-
-src={product.image}
-
-alt={product.name}
-
-className="
-w-full
-h-72
-object-cover
-"
-
-/>
-
-
-<span className="
-absolute
-top-4
-left-4
-bg-pink-600
-text-white
-px-4
-py-2
-rounded-full
-font-bold
-text-sm
-">
-
-NEW
-
-</span>
-
-
-</div>
-
-
-
-<div className="p-6">
-
-
-<h3 className="
-text-xl
-font-bold
-">
-
-{product.name}
-
-</h3>
-
-
-
-<p className="
-text-pink-600
-font-bold
-text-2xl
-mt-3
-">
-
-${product.price}
-
-</p>
-
-
-</div>
-
-
-</div>
-
-
-))
-
-
-}
-
-
-</div>
-
-
-</section>
-
-
-
-{/* ================= BEAUTY GALLERY ================= */}
-
-
-<section className="
-bg-white
-dark:bg-gray-950
-py-20
-">
-
-
-<div className="
-max-w-7xl
-mx-auto
-px-6
-">
-
-
-<h2 className="
-text-4xl
-font-bold
-text-center
-">
-
-Beauty Gallery 📸
-
-</h2>
-
-
-
-<div className="
-grid
-grid-cols-2
-md:grid-cols-4
-gap-6
-mt-12
-">
-
-
-{
-
-[
-
-"/images/2.jpg",
-
-"/images/3.jpg",
-
-"/images/4.jpg",
-
-"/images/cream.jpg"
-
-].map((img)=>(
-
-
-<div
-key={img}
-className="
-overflow-hidden
-rounded-3xl
-shadow-xl
-"
->
-
-
-<img
-
-src={img}
-
-alt="Beauty"
-
-className="
-w-full
-h-64
-object-cover
-hover:scale-110
-transition
-duration-500
-"
-
-/>
-
-
-</div>
-
-
-))
-
-
-}
-
-
-</div>
-
-
-</div>
-
-
-</section>
-
-
-
-
-
-
-{/* ================= WHY SORA ================= */}
-
-
-<section className="
-max-w-7xl
-mx-auto
-px-6
-py-20
-">
-
-
-<div className="
-grid
-md:grid-cols-4
-gap-8
-">
-
-
-{
-
-[
-
-["🚚","Fast Delivery","Quick and reliable delivery"],
-
-["🔒","Secure Payment","Safe Chapa checkout"],
-
-["🌿","Premium Quality","Carefully selected products"],
-
-["⭐","Trusted Brand","Customer satisfaction"]
-
-].map((item)=>(
-
-
-<div
-
-key={item[1]}
-
-className="
-bg-pink-600
-text-white
-rounded-3xl
-p-8
-text-center
-shadow-xl
-"
-
-
->
-
-
-<div className="text-5xl">
-{item[0]}
-</div>
-
-
-<h3 className="
-text-xl
-font-bold
-mt-4
-">
-
-{item[1]}
-
-</h3>
-
-
-<p className="
-mt-3
-text-pink-100
-">
-
-{item[2]}
-
-</p>
-
-
-</div>
-
-
-))
-
-
-}
-
-
-</div>
-
-
-</section>
-
-
-
-
-
-
-{/* ================= TESTIMONIAL ================= */}
-
-
-<section className="
-bg-pink-50
-dark:bg-gray-900
-py-20
-">
-
-
-<div className="
-max-w-6xl
-mx-auto
-px-6
-">
-
-
-<h2 className="
-text-4xl
-font-bold
-text-center
-">
-
-Customer Love 💖
-
-</h2>
-
-
-
-<div className="
-grid
-md:grid-cols-3
-gap-8
-mt-12
-">
-
-
-{
-
-[
-
-"Beautiful products and amazing quality ⭐⭐⭐⭐⭐",
-
-"Fast delivery and excellent service ⭐⭐⭐⭐⭐",
-
-"My favorite cosmetics store ⭐⭐⭐⭐⭐"
-
-].map((review)=>(
-
-
-<div
-
-key={review}
-
-className="
-bg-white
-dark:bg-gray-800
-p-8
-rounded-3xl
-shadow-xl
-text-center
-"
-
-
->
-
-<p className="
-text-lg
-">
-
-{review}
-
-</p>
-
-
-</div>
-
-
-))
-
-
-}
-
-
-</div>
-
-
-</div>
-
-
-</section>
-
-
-
-
-
-
-{/* ================= NEWSLETTER ================= */}
-
-
-<section className="
-max-w-5xl
-mx-auto
-px-6
-py-20
-text-center
-">
-
-
-<h2 className="
-text-4xl
-font-bold
-">
-
-Stay Beautiful With Sora ✨
-
-</h2>
-
-
-<p className="
-mt-4
-text-gray-500
-">
-
-Get updates about new products and offers.
-
-</p>
-
-
-
-<div className="
-flex
-flex-col
-md:flex-row
-gap-4
-mt-8
-justify-center
-">
-
-
-<input
-
-placeholder="Your email"
-
-className="
-border
-p-4
-rounded-xl
-md:w-96
-"
-
-/>
-
-
-
-<button
-
-className="
-bg-pink-600
-text-white
-px-8
-rounded-xl
-font-bold
-"
-
->
-
-Subscribe
-
-</button>
-
-
-</div>
-
-
-</section>
-
-
-
-
-
-</main>
-
-);
-
+    </main>
+  );
 }
