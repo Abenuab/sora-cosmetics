@@ -182,10 +182,17 @@ export default function Footer() {
           © {new Date().getFullYear()} Sora Cosmetics. All rights reserved.
         </p>
 
-        <p className="text-xs text-[#817a75]">
-           Designed & Developed by <span className="text-[#d1aaa1]"></span> Abenezer Fikadu.
-        </p>
-
+       <p className="text-xs text-[#817a75]">
+  Designed & Developed by{" "}
+  <a
+    href="https://www.instagram.com/abenu.46/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="font-semibold text-[#d1aaa1] transition hover:text-white"
+  >
+    Abenezer Fikadu
+  </a>
+</p>
       </div>
 
     </footer>
