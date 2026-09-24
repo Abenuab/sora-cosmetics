@@ -183,7 +183,7 @@ export default function Footer() {
         </p>
 
         <p className="text-xs text-[#817a75]">
-          Made with <span className="text-[#d1aaa1]">♥</span> for beauty.
+          Made with <span className="text-[#d1aaa1]">♥</span> Abenezer Fikadu.
         </p>
 
       </div>
