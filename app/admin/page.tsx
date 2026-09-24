@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-
 type Order = {
   id: string;
   customer_name: string;
@@ -18,7 +17,23 @@ type Order = {
 export default function AdminPage() {
 
   const router = useRouter();
+useEffect(() => {
 
+  checkUser();
+
+}, []);
+
+
+const checkUser = async () => {
+
+  const { data } = await supabase.auth.getUser();
+
+
+  if (!data.user) {
+    router.push("/admin/login");
+  }
+
+};
   useEffect(() => {
 
     const admin = localStorage.getItem("admin");

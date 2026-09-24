@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
+      const baseUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://sora-cosmetics.vercel.app";
+
     const body = await req.json();
 
     const { amount, email, first_name, phone, tx_ref } = body;
@@ -40,11 +44,10 @@ console.log("Type:", typeof amount);
 
           tx_ref: tx_ref,
 
-          callback_url:
-            "http://localhost:3000/api/chapa/verify",
+        
+callback_url: `${baseUrl}/api/chapa/verify`,
 
-          return_url:
-            "http://localhost:3000/success",
+return_url: `${baseUrl}/success`,
         }),
       }
     );

@@ -5,7 +5,11 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useCart } from "@/context/CartContext";
-
+import { Montserrat } from "next/font/google";
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
 
 type Product = {
   id:number | string;
@@ -21,32 +25,46 @@ export default function Home(){
   const { addToCart } = useCart();
 
   const [products,setProducts] = useState<Product[]>([]);
+const [newProducts, setNewProducts] = useState<Product[]>([]);
+
+ useEffect(()=>{
+
+  loadProducts();
+  loadNewProducts();
+
+},[]);
 
 
-  useEffect(()=>{
+  async function loadProducts() {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("featured", true)
+    .limit(4);
 
-    loadProducts();
+  if (error) {
+    console.error(error);
+    return;
+  }
 
-  },[]);
+  setProducts(data || []);
+}
+async function loadNewProducts(){
 
+  const {data,error}= await supabase
+    .from("products")
+    .select("*")
+    .order("id", { ascending:false })
+    .limit(4);
 
+console.log("NEW PRODUCTS:", data);
+  if(!error && data){
 
-  async function loadProducts(){
-
-    const {data,error}=await supabase
-      .from("products")
-      .select("*")
-      .limit(4);
-
-
-    if(!error && data){
-
-      setProducts(data);
-
-    }
+    setNewProducts(data);
 
   }
 
+}
 
 
 return (
@@ -171,36 +189,22 @@ font-bold
 
 
 
-<h1 className="
-mt-8
-text-5xl
-lg:text-7xl
-font-black
-leading-tight
-">
+<h1
+className={`${montserrat.className} mt-8 text-6xl lg:text-8xl font-extrabold leading-tight tracking-tight`}
+>
+  Reveal Your
 
+  <span className="
+  block
+  text-pink-600
+  italic
+  ">
+    Natural Beauty
+  </span>
 
-Reveal Your
-
-<span className="
-block
-text-transparent
-bg-clip-text
-bg-gradient-to-r
-from-pink-600
-to-purple-600
-">
-
-Natural Beauty
-
-</span>
-
-
-With Sora ✨
-
+  With Sora 
 
 </h1>
-
 
 
 
@@ -455,7 +459,7 @@ text-4xl
 font-bold
 ">
 
-Featured Products ✨
+Featured Products 
 
 </h2>
 
@@ -607,8 +611,151 @@ View All Products →
 
 </section>
 
+{/* ================= NEW ARRIVALS ================= */}
+
+<section className="
+max-w-7xl
+mx-auto
+px-6
+py-20
+">
 
 
+<div className="text-center">
+
+<h2 className="
+text-4xl
+font-bold
+">
+
+New Arrivals ✨
+
+</h2>
+
+
+<p className="
+text-gray-500
+mt-4
+text-lg
+">
+
+Latest products added to Sora Beauty
+
+</p>
+
+</div>
+
+
+
+<div className="
+grid
+md:grid-cols-4
+gap-8
+mt-12
+">
+
+
+{
+
+newProducts.map((product)=>(
+
+
+<div
+key={product.id}
+className="
+bg-white
+dark:bg-gray-900
+rounded-3xl
+shadow-xl
+overflow-hidden
+hover:-translate-y-2
+transition
+"
+>
+
+
+<div className="relative">
+
+
+<img
+
+src={product.image}
+
+alt={product.name}
+
+className="
+w-full
+h-72
+object-cover
+"
+
+/>
+
+
+<span className="
+absolute
+top-4
+left-4
+bg-pink-600
+text-white
+px-4
+py-2
+rounded-full
+font-bold
+text-sm
+">
+
+NEW
+
+</span>
+
+
+</div>
+
+
+
+<div className="p-6">
+
+
+<h3 className="
+text-xl
+font-bold
+">
+
+{product.name}
+
+</h3>
+
+
+
+<p className="
+text-pink-600
+font-bold
+text-2xl
+mt-3
+">
+
+${product.price}
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+))
+
+
+}
+
+
+</div>
+
+
+</section>
 
 
 

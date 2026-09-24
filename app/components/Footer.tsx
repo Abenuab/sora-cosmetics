@@ -6,7 +6,7 @@ export default function Footer() {
       </h2>
 
       <p className="mt-3 text-gray-300">
-        Beauty products that make you confident.
+        Invest in your skin—it's your best accessory.
       </p>
 
       <p className="mt-5">
