@@ -6,18 +6,22 @@ export default function Footer() {
   return (
     <footer className="bg-[#292725] text-white">
 
-      {/* Main Footer */}
+      {/* ================= MAIN FOOTER ================= */}
+
       <div className="mx-auto max-w-7xl px-6 py-16 sm:py-20">
 
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
 
-          {/* BRAND */}
+          {/* ================= BRAND ================= */}
+
           <div className="lg:col-span-2">
 
-            <Link href="/" className="inline-block">
-              <h2 className="font-serif text-4xl font-semibold italic tracking-tight text-white">
+            <Link href="/" className="inline-block group">
+
+              <h2 className="font-serif text-4xl font-semibold italic tracking-tight text-white transition duration-300 group-hover:text-[#d1aaa1]">
                 Sora Cosmetics
               </h2>
+
             </Link>
 
             <p className="mt-2 text-xs font-bold uppercase tracking-[0.3em] text-[#d1aaa1]">
@@ -30,16 +34,25 @@ export default function Footer() {
               feel a little more special.
             </p>
 
-            {/* Social icons */}
+
+            {/* ================= SOCIAL ================= */}
+
             <div className="mt-7 flex gap-3">
 
+              {/* INSTAGRAM */}
+
               <a
-                href="#"
+                href="https://www.instagram.com/abenu.46/"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Instagram"
                 className="flex h-11 w-11 items-center justify-center rounded-full border border-[#514b47] bg-[#34312f] text-lg transition duration-300 hover:-translate-y-1 hover:border-[#b98b80] hover:bg-[#b98b80]"
               >
                 ◎
               </a>
+
+
+              {/* FACEBOOK */}
 
               <a
                 href="#"
@@ -48,6 +61,9 @@ export default function Footer() {
               >
                 f
               </a>
+
+
+              {/* EMAIL */}
 
               <a
                 href="mailto:info@soracosmetics.com"
@@ -61,7 +77,9 @@ export default function Footer() {
 
           </div>
 
-          {/* QUICK LINKS */}
+
+          {/* ================= EXPLORE ================= */}
+
           <div>
 
             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-[#d1aaa1]">
@@ -73,7 +91,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/"
-                  className="text-sm text-[#c8c1bc] transition hover:text-white"
+                  className="text-sm text-[#c8c1bc] transition hover:pl-1 hover:text-white"
                 >
                   Home
                 </Link>
@@ -82,7 +100,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/products"
-                  className="text-sm text-[#c8c1bc] transition hover:text-white"
+                  className="text-sm text-[#c8c1bc] transition hover:pl-1 hover:text-white"
                 >
                   Products
                 </Link>
@@ -91,7 +109,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/cart"
-                  className="text-sm text-[#c8c1bc] transition hover:text-white"
+                  className="text-sm text-[#c8c1bc] transition hover:pl-1 hover:text-white"
                 >
                   Shopping Cart
                 </Link>
@@ -100,7 +118,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/my-orders"
-                  className="text-sm text-[#c8c1bc] transition hover:text-white"
+                  className="text-sm text-[#c8c1bc] transition hover:pl-1 hover:text-white"
                 >
                   My Orders
                 </Link>
@@ -109,7 +127,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/contact"
-                  className="text-sm text-[#c8c1bc] transition hover:text-white"
+                  className="text-sm text-[#c8c1bc] transition hover:pl-1 hover:text-white"
                 >
                   Contact Us
                 </Link>
@@ -119,7 +137,9 @@ export default function Footer() {
 
           </div>
 
-          {/* CONTACT */}
+
+          {/* ================= CONTACT ================= */}
+
           <div>
 
             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-[#d1aaa1]">
@@ -128,7 +148,11 @@ export default function Footer() {
 
             <div className="mt-6 space-y-5">
 
+
+              {/* PHONE */}
+
               <div>
+
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#817a75]">
                   Phone
                 </p>
@@ -139,9 +163,14 @@ export default function Footer() {
                 >
                   +251 996 012 811
                 </a>
+
               </div>
 
+
+              {/* EMAIL */}
+
               <div>
+
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#817a75]">
                   Email
                 </p>
@@ -152,16 +181,22 @@ export default function Footer() {
                 >
                   info@soracosmetics.com
                 </a>
+
               </div>
 
+
+              {/* LOCATION */}
+
               <div>
+
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#817a75]">
                   Location
                 </p>
 
                 <p className="mt-1 text-sm text-[#c8c1bc]">
-                  Ethiopia
+                  Ethiopia 🇪🇹
                 </p>
+
               </div>
 
             </div>
@@ -172,27 +207,38 @@ export default function Footer() {
 
       </div>
 
-      {/* Divider */}
+
+      {/* ================= DIVIDER ================= */}
+
       <div className="border-t border-[#403c39]" />
 
-      {/* Bottom Footer */}
+
+      {/* ================= BOTTOM ================= */}
+
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-7 text-center sm:flex-row sm:text-left">
 
         <p className="text-xs text-[#817a75]">
           © {new Date().getFullYear()} Sora Cosmetics. All rights reserved.
         </p>
 
-       <p className="text-xs text-[#817a75]">
-  Designed & Developed by{" "}
-  <a
-    href="https://www.instagram.com/abenu.46/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="font-semibold text-[#d1aaa1] transition hover:text-white"
-  >
-    Abenezer Fikadu
-  </a>
-</p>
+
+        {/* DEVELOPER */}
+
+        <p className="text-xs text-[#817a75]">
+
+          Designed & Developed by{" "}
+
+          <a
+            href="https://www.instagram.com/abenu.46/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[#d1aaa1] transition hover:text-white"
+          >
+            Abenezer Fikadu
+          </a>
+
+        </p>
+
       </div>
 
     </footer>
