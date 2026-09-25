@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { useCart } from "@/context/CartContext";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const { cart } = useCart();
+  const pathname = usePathname();
 
   const [user, setUser] = useState<User | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -39,6 +41,43 @@ export default function Navbar() {
     setMenuOpen(false);
 
     alert("Logged out successfully");
+  }
+
+  // Check active page
+  function isActive(path: string) {
+    return pathname === path;
+  }
+
+  // Desktop navigation link style
+  function navLinkClass(path: string) {
+    return `
+      sora-nav-link
+      relative
+      transition
+      duration-300
+      ${
+        isActive(path)
+          ? "font-semibold text-[#b98b80] after:absolute after:-bottom-2 after:left-0 after:h-[2px] after:w-full after:rounded-full after:bg-[#b98b80]"
+          : "text-[#333] hover:text-[#b98b80]"
+      }
+    `;
+  }
+
+  // Mobile navigation link style
+  function mobileNavLinkClass(path: string) {
+    return `
+      sora-nav-link
+      border-b
+      border-[#eee8e3]
+      py-4
+      transition
+      duration-300
+      ${
+        isActive(path)
+          ? "font-semibold text-[#b98b80]"
+          : "text-[#333] hover:text-[#b98b80]"
+      }
+    `;
   }
 
   return (
@@ -106,7 +145,7 @@ export default function Navbar() {
 
           <Link
             href="/"
-            className="sora-nav-link"
+            className={navLinkClass("/")}
           >
             Home
           </Link>
@@ -115,7 +154,7 @@ export default function Navbar() {
 
           <Link
             href="/products"
-            className="sora-nav-link"
+            className={navLinkClass("/products")}
           >
             Products
           </Link>
@@ -124,7 +163,7 @@ export default function Navbar() {
 
           <Link
             href="/my-orders"
-            className="sora-nav-link"
+            className={navLinkClass("/my-orders")}
           >
             My Orders
           </Link>
@@ -133,7 +172,7 @@ export default function Navbar() {
 
           <Link
             href="/contact"
-            className="sora-nav-link"
+            className={navLinkClass("/contact")}
           >
             Contact
           </Link>
@@ -144,14 +183,21 @@ export default function Navbar() {
 
           <Link
             href="/cart"
-            className="
+            className={`
               sora-nav-link
               group
               relative
               flex
               items-center
               gap-2
-            "
+              transition
+              duration-300
+              ${
+                isActive("/cart")
+                  ? "font-semibold text-[#b98b80]"
+                  : "text-[#333] hover:text-[#b98b80]"
+              }
+            `}
           >
             <span>
               Cart
@@ -202,7 +248,7 @@ export default function Navbar() {
 
               <Link
                 href="/login"
-                className="sora-nav-link"
+                className={navLinkClass("/login")}
               >
                 Login
               </Link>
@@ -390,14 +436,15 @@ export default function Navbar() {
           <Link
             href="/"
             onClick={() => setMenuOpen(false)}
-            className="
-              sora-nav-link
-              border-b
-              border-[#eee8e3]
-              py-4
-            "
+            className={mobileNavLinkClass("/")}
           >
-            Home
+            <div className="flex items-center justify-between">
+              <span>Home</span>
+
+              {isActive("/") && (
+                <span className="h-2 w-2 rounded-full bg-[#b98b80]" />
+              )}
+            </div>
           </Link>
 
           {/* PRODUCTS */}
@@ -405,14 +452,15 @@ export default function Navbar() {
           <Link
             href="/products"
             onClick={() => setMenuOpen(false)}
-            className="
-              sora-nav-link
-              border-b
-              border-[#eee8e3]
-              py-4
-            "
+            className={mobileNavLinkClass("/products")}
           >
-            Products
+            <div className="flex items-center justify-between">
+              <span>Products</span>
+
+              {isActive("/products") && (
+                <span className="h-2 w-2 rounded-full bg-[#b98b80]" />
+              )}
+            </div>
           </Link>
 
           {/* MY ORDERS */}
@@ -420,14 +468,15 @@ export default function Navbar() {
           <Link
             href="/my-orders"
             onClick={() => setMenuOpen(false)}
-            className="
-              sora-nav-link
-              border-b
-              border-[#eee8e3]
-              py-4
-            "
+            className={mobileNavLinkClass("/my-orders")}
           >
-            My Orders
+            <div className="flex items-center justify-between">
+              <span>My Orders</span>
+
+              {isActive("/my-orders") && (
+                <span className="h-2 w-2 rounded-full bg-[#b98b80]" />
+              )}
+            </div>
           </Link>
 
           {/* CONTACT */}
@@ -435,14 +484,15 @@ export default function Navbar() {
           <Link
             href="/contact"
             onClick={() => setMenuOpen(false)}
-            className="
-              sora-nav-link
-              border-b
-              border-[#eee8e3]
-              py-4
-            "
+            className={mobileNavLinkClass("/contact")}
           >
-            Contact
+            <div className="flex items-center justify-between">
+              <span>Contact</span>
+
+              {isActive("/contact") && (
+                <span className="h-2 w-2 rounded-full bg-[#b98b80]" />
+              )}
+            </div>
           </Link>
 
           {/* CART */}
@@ -450,7 +500,7 @@ export default function Navbar() {
           <Link
             href="/cart"
             onClick={() => setMenuOpen(false)}
-            className="
+            className={`
               sora-nav-link
               flex
               items-center
@@ -458,7 +508,14 @@ export default function Navbar() {
               border-b
               border-[#eee8e3]
               py-4
-            "
+              transition
+              duration-300
+              ${
+                isActive("/cart")
+                  ? "font-semibold text-[#b98b80]"
+                  : "text-[#333] hover:text-[#b98b80]"
+              }
+            `}
           >
             <span>
               Cart 🛒
@@ -504,19 +561,21 @@ export default function Navbar() {
               <Link
                 href="/login"
                 onClick={() => setMenuOpen(false)}
-                className="
+                className={`
                   rounded-full
                   border
-                  border-[#dcd3ce]
                   py-3
                   text-center
                   font-[var(--font-manrope)]
                   text-sm
                   font-medium
-                  text-[#333]
                   transition
-                  hover:bg-[#f8f5f2]
-                "
+                  ${
+                    isActive("/login")
+                      ? "border-[#b98b80] bg-[#b98b80] text-white"
+                      : "border-[#dcd3ce] text-[#333] hover:bg-[#f8f5f2]"
+                  }
+                `}
               >
                 Login
               </Link>
