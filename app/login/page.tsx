@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,196 +10,135 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const login = async () => {
-    setErrorMessage("");
-
-    if (!email.trim() || !password) {
-      setErrorMessage("Please enter your email and password.");
-      return;
-    }
-
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
       password,
     });
 
     setLoading(false);
 
     if (error) {
-      console.error("LOGIN ERROR:", error);
-
-      setErrorMessage(error.message);
+      alert(error.message);
       return;
     }
 
-    console.log("LOGIN SUCCESS:", data.user);
-
     router.push("/");
-    router.refresh();
+  };
+
+  const loginWithGoogle = async () => {
+    setGoogleLoading(true);
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      },
+    });
+
+    if (error) {
+      setGoogleLoading(false);
+      alert(error.message);
+    }
   };
 
   return (
-    <main className="min-h-screen bg-[#faf8f5] px-6 py-20 text-[#292725]">
+    <main className="min-h-screen bg-[#f5efe9] px-6 py-16">
+      <div className="mx-auto max-w-md rounded-3xl bg-white p-8 shadow-xl">
 
-      <div className="mx-auto max-w-md">
+        <h1 className="text-center font-serif text-4xl font-semibold text-[#292725]">
+          Welcome Back
+        </h1>
 
-        {/* Header */}
+        <p className="mt-2 text-center text-sm text-[#8b6f61]">
+          Login to your Sora Cosmetics account
+        </p>
 
-        <div className="mb-10 text-center">
+        {/* Email */}
+        <div className="mt-8">
+          <label className="mb-2 block text-sm font-medium text-[#292725]">
+            Email
+          </label>
 
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#b98b80]">
-            Sora Cosmetics
-          </p>
-
-          <h1 className="mt-3 font-serif text-4xl font-semibold">
-            Welcome Back
-          </h1>
-
-          <p className="mt-3 text-sm text-[#77716c]">
-            Login to your Sora Cosmetics account.
-          </p>
-
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-xl border border-[#ddd3cc] px-4 py-3 outline-none transition focus:border-[#b98b80]"
+          />
         </div>
 
-        {/* Login Card */}
+        {/* Password */}
+        <div className="mt-4">
+          <label className="mb-2 block text-sm font-medium text-[#292725]">
+            Password
+          </label>
 
-        <div className="rounded-[28px] border border-[#e5e0db] bg-white p-7 shadow-[0_15px_45px_rgba(40,35,30,0.08)] sm:p-9">
+          <input
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-xl border border-[#ddd3cc] px-4 py-3 outline-none transition focus:border-[#b98b80]"
+          />
+        </div>
 
-          {/* Error */}
+        {/* Login */}
+        <button
+          onClick={login}
+          disabled={loading}
+          className="mt-6 w-full rounded-xl bg-[#292725] py-3 font-medium text-white transition hover:bg-[#b98b80] disabled:opacity-60"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
 
-          {errorMessage && (
-            <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {errorMessage}
-            </div>
-          )}
+        {/* Divider */}
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-[#ddd3cc]" />
 
-          {/* Email */}
+          <span className="text-xs text-[#8b6f61]">
+            OR
+          </span>
 
-          <div className="mb-5">
+          <div className="h-px flex-1 bg-[#ddd3cc]" />
+        </div>
 
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-semibold text-[#292725]"
-            >
-              Email
-            </label>
+        {/* Google */}
+        <button
+          type="button"
+          onClick={loginWithGoogle}
+          disabled={googleLoading}
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#ddd3cc] bg-white py-3 font-medium text-[#292725] transition hover:bg-[#f5efe9] disabled:opacity-60"
+        >
+          <span className="text-xl font-bold">
+            G
+          </span>
 
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="
-                w-full
-                rounded-xl
-                border
-                border-[#ded9d4]
-                bg-[#fffdfb]
-                px-4
-                py-3.5
-                text-[#292725]
-                outline-none
-                transition
-                placeholder:text-[#aaa39d]
-                focus:border-[#b98b80]
-                focus:ring-2
-                focus:ring-[#b98b80]/20
-              "
-            />
+          <span>
+            {googleLoading
+              ? "Connecting..."
+              : "Continue with Google"}
+          </span>
+        </button>
 
-          </div>
+        {/* Register */}
+        <p className="mt-6 text-center text-sm text-[#8b6f61]">
+          Don't have an account?{" "}
 
-          {/* Password */}
-
-          <div className="mb-6">
-
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-semibold text-[#292725]"
-            >
-              Password
-            </label>
-
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  login();
-                }
-              }}
-              className="
-                w-full
-                rounded-xl
-                border
-                border-[#ded9d4]
-                bg-[#fffdfb]
-                px-4
-                py-3.5
-                text-[#292725]
-                outline-none
-                transition
-                placeholder:text-[#aaa39d]
-                focus:border-[#b98b80]
-                focus:ring-2
-                focus:ring-[#b98b80]/20
-              "
-            />
-
-          </div>
-
-          {/* Login Button */}
-
-          <button
-            onClick={login}
-            disabled={loading}
-            className="
-              w-full
-              rounded-xl
-              bg-[#292725]
-              py-3.5
-              font-semibold
-              text-white
-              transition
-              duration-300
-              hover:-translate-y-0.5
-              hover:bg-[#b98b80]
-              disabled:cursor-not-allowed
-              disabled:opacity-60
-            "
+          <a
+            href="/register"
+            className="font-semibold text-[#292725] hover:text-[#b98b80]"
           >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-
-          {/* Register */}
-
-          <p className="mt-7 text-center text-sm text-[#77716c]">
-
-            Don't have an account?{" "}
-
-            <Link
-              href="/register"
-              className="font-semibold text-[#a4766b] transition hover:text-[#80564d] hover:underline"
-            >
-              Create an account
-            </Link>
-
-          </p>
-
-        </div>
+            Create account
+          </a>
+        </p>
 
       </div>
-
     </main>
   );
 }

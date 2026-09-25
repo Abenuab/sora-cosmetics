@@ -15,19 +15,21 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    // Get current user
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
     });
 
+    // Listen for login/logout changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const cartCount = cart.reduce(
@@ -38,6 +40,7 @@ export default function Navbar() {
   async function logout() {
     await supabase.auth.signOut();
 
+    setUser(null);
     setMenuOpen(false);
 
     alert("Logged out successfully");
@@ -48,7 +51,7 @@ export default function Navbar() {
     return pathname === path;
   }
 
-  // Desktop navigation link style
+  // Desktop navigation style
   function navLinkClass(path: string) {
     return `
       sora-nav-link
@@ -63,7 +66,7 @@ export default function Navbar() {
     `;
   }
 
-  // Mobile navigation link style
+  // Mobile navigation style
   function mobileNavLinkClass(path: string) {
     return `
       sora-nav-link
@@ -83,15 +86,15 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-[#e8e3df] bg-white/95 backdrop-blur-md">
 
-      {/* ========================================
+      {/* ================================
           MAIN NAVBAR
-      ======================================== */}
+      ================================= */}
 
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-8">
 
-        {/* ========================================
+        {/* ================================
             LOGO
-        ======================================== */}
+        ================================= */}
 
         <Link
           href="/"
@@ -127,9 +130,9 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* ========================================
+        {/* ================================
             DESKTOP NAVIGATION
-        ======================================== */}
+        ================================= */}
 
         <div
           className="
@@ -177,9 +180,7 @@ export default function Navbar() {
             Contact
           </Link>
 
-          {/* ========================================
-              CART
-          ======================================== */}
+          {/* CART */}
 
           <Link
             href="/cart"
@@ -199,9 +200,7 @@ export default function Navbar() {
               }
             `}
           >
-            <span>
-              Cart
-            </span>
+            <span>Cart</span>
 
             <span
               className="
@@ -238,9 +237,9 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* ========================================
+          {/* ================================
               AUTH
-          ======================================== */}
+          ================================= */}
 
           {!user ? (
             <>
@@ -283,20 +282,28 @@ export default function Navbar() {
 
               <span
                 className="
-                  max-w-[180px]
+                  max-w-[200px]
                   truncate
+                  rounded-full
+                  border
+                  border-[#e8e1dc]
+                  bg-[#faf7f4]
+                  px-4
+                  py-2
                   font-[var(--font-manrope)]
                   text-xs
-                  text-[#8b817b]
+                  font-medium
+                  text-[#5f5752]
                 "
                 title={user.email ?? ""}
               >
-                {user.email}
+                {user.email || "Google User"}
               </span>
 
               {/* LOGOUT */}
 
               <button
+                type="button"
                 onClick={logout}
                 className="
                   rounded-full
@@ -319,9 +326,9 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* ========================================
+        {/* ================================
             MOBILE MENU BUTTON
-        ======================================== */}
+        ================================= */}
 
         <button
           type="button"
@@ -396,12 +403,11 @@ export default function Navbar() {
 
           </div>
         </button>
-
       </div>
 
-      {/* ========================================
+      {/* ================================
           MOBILE MENU
-      ======================================== */}
+      ================================= */}
 
       <div
         className={`
@@ -419,7 +425,6 @@ export default function Navbar() {
           }
         `}
       >
-
         <div
           className="
             mx-auto
@@ -517,9 +522,7 @@ export default function Navbar() {
               }
             `}
           >
-            <span>
-              Cart 🛒
-            </span>
+            <span>Cart 🛒</span>
 
             {cartCount > 0 && (
               <span
@@ -542,9 +545,9 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* ========================================
+          {/* ================================
               MOBILE AUTH
-          ======================================== */}
+          ================================= */}
 
           {!user ? (
             <div
@@ -605,23 +608,41 @@ export default function Navbar() {
           ) : (
             <div className="pt-5">
 
-              {/* USER */}
+              {/* USER EMAIL */}
 
-              <p
+              <div
                 className="
                   mb-3
-                  truncate
-                  font-[var(--font-manrope)]
-                  text-xs
-                  text-[#8b817b]
+                  rounded-2xl
+                  border
+                  border-[#e8e1dc]
+                  bg-[#faf7f4]
+                  px-4
+                  py-3
                 "
               >
-                {user.email}
-              </p>
+                <p className="text-[10px] uppercase tracking-wider text-[#9a8c84]">
+                  Signed in as
+                </p>
+
+                <p
+                  className="
+                    mt-1
+                    truncate
+                    font-[var(--font-manrope)]
+                    text-sm
+                    font-medium
+                    text-[#5f5752]
+                  "
+                >
+                  {user.email || "Google User"}
+                </p>
+              </div>
 
               {/* LOGOUT */}
 
               <button
+                type="button"
                 onClick={logout}
                 className="
                   w-full
@@ -643,9 +664,7 @@ export default function Navbar() {
           )}
 
         </div>
-
       </div>
-
     </nav>
   );
 }
