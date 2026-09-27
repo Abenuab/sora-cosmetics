@@ -18,6 +18,7 @@ export default function CartPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [paymentReference, setPaymentReference] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -29,8 +30,13 @@ export default function CartPage() {
   );
 
   const handlePayment = async () => {
-    if (!name || !phone || !address) {
-      alert("Please fill all fields");
+    if (!name.trim() || !phone.trim() || !address.trim()) {
+      alert("Please fill all customer information");
+      return;
+    }
+
+    if (!paymentReference.trim()) {
+      alert("Please enter your Telebirr transaction ID");
       return;
     }
 
@@ -40,6 +46,7 @@ export default function CartPage() {
     }
 
     setLoading(true);
+    setMessage("");
 
     try {
       const {
@@ -52,63 +59,47 @@ export default function CartPage() {
         return;
       }
 
-      const txRef = "sora-" + Date.now();
+      const orderRef = "telebirr-" + Date.now();
 
       const { error } = await supabase
         .from("orders")
         .insert([
           {
-            customer_name: name,
-            phone: phone,
-            address: address,
+            customer_name: name.trim(),
+            phone: phone.trim(),
+            address: address.trim(),
             products: cart,
             total: total,
             customer_email: user.email,
+
             status: "Pending",
             payment_status: "Pending",
-            tx_ref: txRef,
+
+            tx_ref: orderRef,
+
+            payment_method: "Telebirr",
+            payment_reference: paymentReference.trim(),
           },
         ]);
 
       if (error) {
-        console.log(error);
+        console.error("Order error:", error);
         alert(error.message);
         return;
       }
 
-      const res = await fetch("/api/chapa", {
-        method: "POST",
+      clearCart();
 
-        headers: {
-          "Content-Type": "application/json",
-        },
+      setMessage(
+        "Order submitted successfully. Your payment will be verified."
+      );
 
-        body: JSON.stringify({
-          amount: total,
-          email: user.email,
-          first_name: name,
-          phone: phone,
-          tx_ref: txRef,
-        }),
-      });
-
-      const data = await res.json();
-
-      console.log("CHAPA RESPONSE:", data);
-
-      if (data.status === "success") {
-        clearCart();
-
-        window.location.href =
-          data.data.checkout_url;
-      } else {
-        alert("Payment initialization failed");
-        console.log(data);
-      }
+      setTimeout(() => {
+        router.push("/success");
+      }, 1500);
     } catch (error) {
-      console.log(error);
-
-      alert("Something went wrong");
+      console.error("Checkout error:", error);
+      alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -118,9 +109,7 @@ export default function CartPage() {
     <main className="min-h-screen bg-[#fcfaf8] px-5 py-12 md:px-8 md:py-16">
       <div className="mx-auto max-w-7xl">
 
-        {/* ========================================
-            PAGE HEADER
-        ======================================== */}
+        {/* PAGE HEADER */}
 
         <div className="mb-12 text-center">
 
@@ -141,9 +130,7 @@ export default function CartPage() {
 
         </div>
 
-        {/* ========================================
-            EMPTY CART
-        ======================================== */}
+        {/* EMPTY CART */}
 
         {cart.length === 0 ? (
 
@@ -175,9 +162,7 @@ export default function CartPage() {
 
           <div className="grid items-start gap-10 lg:grid-cols-3">
 
-            {/* ========================================
-                CART PRODUCTS
-            ======================================== */}
+            {/* CART PRODUCTS */}
 
             <div className="space-y-5 lg:col-span-2">
 
@@ -213,7 +198,7 @@ export default function CartPage() {
                   className="group flex flex-col gap-5 rounded-[1.75rem] border border-[#ebe4df] bg-white p-5 shadow-[0_10px_35px_rgba(50,40,35,0.05)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_15px_45px_rgba(50,40,35,0.08)] sm:flex-row sm:items-center"
                 >
 
-                  {/* Product Image */}
+                  {/* PRODUCT IMAGE */}
 
                   <div className="relative h-36 w-full shrink-0 overflow-hidden rounded-2xl bg-[#f6f2ef] sm:h-32 sm:w-32">
 
@@ -225,7 +210,7 @@ export default function CartPage() {
 
                   </div>
 
-                  {/* Product Info */}
+                  {/* PRODUCT DETAILS */}
 
                   <div className="flex-1">
 
@@ -240,10 +225,10 @@ export default function CartPage() {
                     )}
 
                     <p className="mt-3 text-lg font-semibold text-[#8b6f61]">
-                      ETB{Number(item.price).toFixed(2)}
+                      ETB {Number(item.price).toFixed(2)}
                     </p>
 
-                    {/* Quantity */}
+                    {/* QUANTITY */}
 
                     <div className="mt-5 flex items-center gap-3">
 
@@ -281,7 +266,7 @@ export default function CartPage() {
 
                   </div>
 
-                  {/* Remove */}
+                  {/* REMOVE */}
 
                   <button
                     onClick={() =>
@@ -298,15 +283,13 @@ export default function CartPage() {
 
             </div>
 
-            {/* ========================================
-                CHECKOUT
-            ======================================== */}
+            {/* CHECKOUT */}
 
             <div className="lg:sticky lg:top-28">
 
               <div className="rounded-[2rem] border border-[#e7ded8] bg-white p-6 shadow-[0_15px_50px_rgba(50,40,35,0.07)] md:p-8">
 
-                {/* Checkout Header */}
+                {/* CHECKOUT HEADER */}
 
                 <div className="mb-7">
 
@@ -320,7 +303,7 @@ export default function CartPage() {
 
                 </div>
 
-                {/* Total */}
+                {/* TOTAL */}
 
                 <div className="mb-7 rounded-2xl bg-[#f8f4f1] p-5">
 
@@ -337,16 +320,16 @@ export default function CartPage() {
                   </div>
 
                   <div className="mt-2 text-4xl font-semibold text-[#1f1f1f]">
-                    ETB{total.toFixed(2)}
+                    ETB {total.toFixed(2)}
                   </div>
 
                 </div>
 
-                {/* Form */}
+                {/* CUSTOMER INFORMATION */}
 
                 <div className="space-y-4">
 
-                  {/* Name */}
+                  {/* NAME */}
 
                   <div>
 
@@ -366,7 +349,7 @@ export default function CartPage() {
 
                   </div>
 
-                  {/* Phone */}
+                  {/* PHONE */}
 
                   <div>
 
@@ -386,7 +369,7 @@ export default function CartPage() {
 
                   </div>
 
-                  {/* Address */}
+                  {/* ADDRESS */}
 
                   <div>
 
@@ -407,7 +390,67 @@ export default function CartPage() {
 
                 </div>
 
-                {/* Payment Button */}
+                {/* TELEBIRR PAYMENT */}
+
+                <div className="mt-6 rounded-2xl border border-[#e5d8cf] bg-[#faf6f3] p-5">
+
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a7564]">
+                    Payment Method
+                  </p>
+
+                  <h3 className="mt-2 text-xl font-semibold text-[#1f1f1f]">
+                    📱 Telebirr
+                  </h3>
+
+                  <p className="mt-3 text-sm leading-6 text-[#77716d]">
+                    Send the exact amount shown above to our
+                    Telebirr account, then enter your transaction
+                    ID below.
+                  </p>
+
+                  {/* TELEBIRR ACCOUNT */}
+
+                  <div className="mt-4 rounded-xl bg-white p-4">
+
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#99908b]">
+                      Telebirr Number
+                    </p>
+
+                    <p className="mt-1 text-xl font-bold text-[#1f1f1f]">
+                      0996012811
+                    </p>
+
+                    <p className="mt-2 text-xs text-[#77716d]">
+                      Account Name: Abenezer Fikadu
+                    </p>
+
+                  </div>
+
+                  {/* TRANSACTION ID */}
+
+                  <div className="mt-4">
+
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[#77716d]">
+                      Telebirr Transaction ID
+                    </label>
+
+                    <input
+                      type="text"
+                      placeholder="Enter transaction ID"
+                      value={paymentReference}
+                      onChange={(e) =>
+                        setPaymentReference(
+                          e.target.value
+                        )
+                      }
+                      className="w-full rounded-xl border border-[#ded6d0] bg-white px-4 py-3.5 text-sm text-[#333] outline-none transition placeholder:text-[#aaa09a] focus:border-[#8b6f61] focus:ring-2 focus:ring-[#8b6f61]/10"
+                    />
+
+                  </div>
+
+                </div>
+
+                {/* SUBMIT ORDER */}
 
                 <button
                   onClick={handlePayment}
@@ -415,16 +458,24 @@ export default function CartPage() {
                   className="mt-6 w-full rounded-full bg-[#1f1f1f] py-4 text-sm font-semibold tracking-wide text-white shadow-lg transition duration-300 hover:bg-[#8b6f61] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading
-                    ? "Processing..."
-                    : "Pay with Chapa  💳"}
+                    ? "Submitting Order..."
+                    : "Place Order • Telebirr"}
                 </button>
 
-                {/* Security Text */}
+                {/* PAYMENT NOTICE */}
 
                 <div className="mt-5 flex items-center justify-center gap-2 text-center text-xs text-[#8b817b]">
+
                   <span>🔒</span>
-                  <span>Secure payment powered by Chapa</span>
+
+                  <span>
+                    Payment will be verified before your
+                    order is completed.
+                  </span>
+
                 </div>
+
+                {/* SUCCESS MESSAGE */}
 
                 {message && (
                   <p className="mt-4 text-center text-sm font-semibold text-green-600">
@@ -434,10 +485,12 @@ export default function CartPage() {
 
               </div>
 
-              {/* Continue Shopping */}
+              {/* CONTINUE SHOPPING */}
 
               <button
-                onClick={() => router.push("/products")}
+                onClick={() =>
+                  router.push("/products")
+                }
                 className="mt-5 w-full rounded-full border border-[#ded5cf] bg-white py-3.5 text-sm font-semibold tracking-wide text-[#444] transition duration-300 hover:border-[#1f1f1f] hover:bg-[#1f1f1f] hover:text-white"
               >
                 ← Continue Shopping
