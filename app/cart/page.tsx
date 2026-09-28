@@ -23,14 +23,30 @@ export default function CartPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  // =========================
+  // TOTAL
+  // =========================
+
   const total = cart.reduce(
     (sum, item) =>
       sum + Number(item.price) * item.quantity,
     0
   );
 
+  // =========================
+  // PLACE ORDER
+  // =========================
+
   const handlePayment = async () => {
-    if (!name.trim() || !phone.trim() || !address.trim()) {
+    // -------------------------
+    // VALIDATION
+    // -------------------------
+
+    if (
+      !name.trim() ||
+      !phone.trim() ||
+      !address.trim()
+    ) {
       alert("Please fill all customer information");
       return;
     }
@@ -49,6 +65,10 @@ export default function CartPage() {
     setMessage("");
 
     try {
+      // -------------------------
+      // CHECK LOGIN
+      // -------------------------
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -59,57 +79,140 @@ export default function CartPage() {
         return;
       }
 
-      const orderRef = "telebirr-" + Date.now();
+      // -------------------------
+      // CREATE INTERNAL ORDER REF
+      // -------------------------
 
-      const { error } = await supabase
+      const orderRef =
+        "telebirr-" + Date.now();
+
+      // -------------------------
+      // SAVE ORDER
+      // -------------------------
+
+      const {
+        data: insertedOrder,
+        error,
+      } = await supabase
         .from("orders")
         .insert([
           {
             customer_name: name.trim(),
+
             phone: phone.trim(),
+
             address: address.trim(),
+
             products: cart,
+
             total: total,
+
             customer_email: user.email,
 
+            // Order status
             status: "Pending",
+
+            // Payment status
             payment_status: "Pending",
 
+            // Our internal order reference
             tx_ref: orderRef,
 
+            // Payment information
             payment_method: "Telebirr",
-            payment_reference: paymentReference.trim(),
+
+            // Customer's Telebirr Transaction ID
+            payment_reference:
+              paymentReference.trim(),
           },
-        ]);
+        ])
+        .select()
+        .single();
+
+      // -------------------------
+      // CHECK ERROR
+      // -------------------------
 
       if (error) {
-        console.error("Order error:", error);
+        console.error(
+          "Order error:",
+          error
+        );
+
         alert(error.message);
         return;
       }
 
+      // -------------------------
+      // DEBUG
+      // -------------------------
+
+      console.log(
+        "ORDER CREATED:",
+        insertedOrder
+      );
+
+      console.log(
+        "TELEBIRR TRANSACTION ID:",
+        insertedOrder?.payment_reference
+      );
+
+      console.log(
+        "PAYMENT METHOD:",
+        insertedOrder?.payment_method
+      );
+
+      console.log(
+        "PAYMENT STATUS:",
+        insertedOrder?.payment_status
+      );
+
+      // -------------------------
+      // CLEAR CART
+      // -------------------------
+
       clearCart();
+
+      // -------------------------
+      // SUCCESS MESSAGE
+      // -------------------------
 
       setMessage(
         "Order submitted successfully. Your payment will be verified."
       );
 
+      // -------------------------
+      // GO TO SUCCESS PAGE
+      // -------------------------
+
       setTimeout(() => {
         router.push("/success");
       }, 1500);
     } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Something went wrong. Please try again.");
+      console.error(
+        "Checkout error:",
+        error
+      );
+
+      alert(
+        "Something went wrong. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  // =========================
+  // PAGE
+  // =========================
+
   return (
     <main className="min-h-screen bg-[#fcfaf8] px-5 py-12 md:px-8 md:py-16">
       <div className="mx-auto max-w-7xl">
 
-        {/* PAGE HEADER */}
+        {/* =========================
+            PAGE HEADER
+        ========================= */}
 
         <div className="mb-12 text-center">
 
@@ -130,7 +233,9 @@ export default function CartPage() {
 
         </div>
 
-        {/* EMPTY CART */}
+        {/* =========================
+            EMPTY CART
+        ========================= */}
 
         {cart.length === 0 ? (
 
@@ -150,7 +255,9 @@ export default function CartPage() {
             </p>
 
             <button
-              onClick={() => router.push("/products")}
+              onClick={() =>
+                router.push("/products")
+              }
               className="mt-8 rounded-full bg-[#1f1f1f] px-8 py-3.5 text-sm font-semibold tracking-wide text-white transition duration-300 hover:bg-[#8b6f61] hover:shadow-lg"
             >
               Continue Shopping
@@ -162,13 +269,16 @@ export default function CartPage() {
 
           <div className="grid items-start gap-10 lg:grid-cols-3">
 
-            {/* CART PRODUCTS */}
+            {/* =========================
+                CART PRODUCTS
+            ========================= */}
 
             <div className="space-y-5 lg:col-span-2">
 
               <div className="mb-5 flex items-center justify-between">
 
                 <div>
+
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a7564]">
                     Shopping Bag
                   </p>
@@ -180,6 +290,7 @@ export default function CartPage() {
                       : "items"}{" "}
                     in your cart
                   </p>
+
                 </div>
 
                 <button
@@ -191,6 +302,8 @@ export default function CartPage() {
 
               </div>
 
+              {/* PRODUCTS */}
+
               {cart.map((item) => (
 
                 <div
@@ -198,7 +311,7 @@ export default function CartPage() {
                   className="group flex flex-col gap-5 rounded-[1.75rem] border border-[#ebe4df] bg-white p-5 shadow-[0_10px_35px_rgba(50,40,35,0.05)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_15px_45px_rgba(50,40,35,0.08)] sm:flex-row sm:items-center"
                 >
 
-                  {/* PRODUCT IMAGE */}
+                  {/* IMAGE */}
 
                   <div className="relative h-36 w-full shrink-0 overflow-hidden rounded-2xl bg-[#f6f2ef] sm:h-32 sm:w-32">
 
@@ -210,7 +323,7 @@ export default function CartPage() {
 
                   </div>
 
-                  {/* PRODUCT DETAILS */}
+                  {/* DETAILS */}
 
                   <div className="flex-1">
 
@@ -225,7 +338,10 @@ export default function CartPage() {
                     )}
 
                     <p className="mt-3 text-lg font-semibold text-[#8b6f61]">
-                      ETB {Number(item.price).toFixed(2)}
+                      ETB{" "}
+                      {Number(
+                        item.price
+                      ).toFixed(2)}
                     </p>
 
                     {/* QUANTITY */}
@@ -283,7 +399,9 @@ export default function CartPage() {
 
             </div>
 
-            {/* CHECKOUT */}
+            {/* =========================
+                CHECKOUT
+            ========================= */}
 
             <div className="lg:sticky lg:top-28">
 
@@ -320,12 +438,15 @@ export default function CartPage() {
                   </div>
 
                   <div className="mt-2 text-4xl font-semibold text-[#1f1f1f]">
-                    ETB {total.toFixed(2)}
+                    ETB{" "}
+                    {total.toFixed(2)}
                   </div>
 
                 </div>
 
-                {/* CUSTOMER INFORMATION */}
+                {/* =========================
+                    CUSTOMER INFORMATION
+                ========================= */}
 
                 <div className="space-y-4">
 
@@ -342,7 +463,9 @@ export default function CartPage() {
                       placeholder="Enter your full name"
                       value={name}
                       onChange={(e) =>
-                        setName(e.target.value)
+                        setName(
+                          e.target.value
+                        )
                       }
                       className="w-full rounded-xl border border-[#ded6d0] bg-[#fffdfb] px-4 py-3.5 text-sm text-[#333] outline-none transition placeholder:text-[#aaa09a] focus:border-[#8b6f61] focus:ring-2 focus:ring-[#8b6f61]/10"
                     />
@@ -362,7 +485,9 @@ export default function CartPage() {
                       placeholder="Enter your phone number"
                       value={phone}
                       onChange={(e) =>
-                        setPhone(e.target.value)
+                        setPhone(
+                          e.target.value
+                        )
                       }
                       className="w-full rounded-xl border border-[#ded6d0] bg-[#fffdfb] px-4 py-3.5 text-sm text-[#333] outline-none transition placeholder:text-[#aaa09a] focus:border-[#8b6f61] focus:ring-2 focus:ring-[#8b6f61]/10"
                     />
@@ -381,7 +506,9 @@ export default function CartPage() {
                       placeholder="Enter your delivery address"
                       value={address}
                       onChange={(e) =>
-                        setAddress(e.target.value)
+                        setAddress(
+                          e.target.value
+                        )
                       }
                       className="h-28 w-full resize-none rounded-xl border border-[#ded6d0] bg-[#fffdfb] px-4 py-3.5 text-sm text-[#333] outline-none transition placeholder:text-[#aaa09a] focus:border-[#8b6f61] focus:ring-2 focus:ring-[#8b6f61]/10"
                     />
@@ -390,7 +517,9 @@ export default function CartPage() {
 
                 </div>
 
-                {/* TELEBIRR PAYMENT */}
+                {/* =========================
+                    TELEBIRR PAYMENT
+                ========================= */}
 
                 <div className="mt-6 rounded-2xl border border-[#e5d8cf] bg-[#faf6f3] p-5">
 
@@ -426,7 +555,9 @@ export default function CartPage() {
 
                   </div>
 
-                  {/* TRANSACTION ID */}
+                  {/* =========================
+                      TRANSACTION ID
+                  ========================= */}
 
                   <div className="mt-4">
 
@@ -443,14 +574,21 @@ export default function CartPage() {
                           e.target.value
                         )
                       }
-                      className="w-full rounded-xl border border-[#ded6d0] bg-white px-4 py-3.5 text-sm text-[#333] outline-none transition placeholder:text-[#aaa09a] focus:border-[#8b6f61] focus:ring-2 focus:ring-[#8b6f61]/10"
+                      className="w-full rounded-xl border border-[#ded6d0] bg-white px-4 py-3.5 text-sm font-medium text-[#222] outline-none transition placeholder:text-[#aaa09a] focus:border-[#8b6f61] focus:ring-2 focus:ring-[#8b6f61]/10"
                     />
+
+                    <p className="mt-2 text-xs leading-5 text-[#8b817b]">
+                      Enter the transaction ID you received
+                      from Telebirr after making the payment.
+                    </p>
 
                   </div>
 
                 </div>
 
-                {/* SUBMIT ORDER */}
+                {/* =========================
+                    SUBMIT ORDER
+                ========================= */}
 
                 <button
                   onClick={handlePayment}
