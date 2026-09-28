@@ -5,10 +5,13 @@ import { supabase } from "@/lib/supabase";
 
 type Order = {
   id: number | string;
+  order_number: number;
+
   customer_name: string;
   customer_email: string;
   phone: string;
   address: string;
+
   products: {
     id: number | string;
     name: string;
@@ -17,9 +20,12 @@ type Order = {
     quantity: number;
     category?: string;
   }[];
+
   total: number;
+
   status: string;
   payment_status: string;
+
   tx_ref: string;
   created_at: string;
 };
@@ -183,8 +189,13 @@ export default function MyOrdersPage() {
                           Order
                         </p>
 
+                        {/* Customer-friendly Order Number */}
                         <h2 className="mt-1 text-lg font-bold text-[#241f1c]">
-                          #{order.id}
+                          #SORA-
+                          {String(order.order_number).padStart(
+                            4,
+                            "0"
+                          )}
                         </h2>
 
                         <p className="mt-1 text-sm text-[#82756e]">
@@ -194,6 +205,7 @@ export default function MyOrdersPage() {
 
                       <div className="flex flex-wrap gap-3">
 
+                        {/* Payment Status */}
                         <span
                           className={`rounded-full px-4 py-2 text-xs font-bold ${
                             paymentCompleted
@@ -206,6 +218,7 @@ export default function MyOrdersPage() {
                             "Pending"}
                         </span>
 
+                        {/* Order Status */}
                         <span className="rounded-full bg-[#f1ebe7] px-4 py-2 text-xs font-bold capitalize text-[#5f534c]">
                           Order:{" "}
                           {order.status || "Pending"}
@@ -224,58 +237,68 @@ export default function MyOrdersPage() {
 
                     <div className="space-y-4">
                       {Array.isArray(order.products) &&
-                        order.products.map((product, index) => (
+                        order.products.map(
+                          (product, index) => (
 
-                          <div
-                            key={`${product.id}-${index}`}
-                            className="flex items-center gap-4 rounded-2xl border border-[#eee7e2] p-4"
-                          >
+                            <div
+                              key={`${product.id}-${index}`}
+                              className="flex items-center gap-4 rounded-2xl border border-[#eee7e2] p-4"
+                            >
 
-                            {product.image ? (
-                              <img
-                                src={product.image}
-                                alt={product.name}
-                                className="h-20 w-20 rounded-xl object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-[#f5efeb] text-2xl">
-                                💄
-                              </div>
-                            )}
-
-                            <div className="min-w-0 flex-1">
-                              <h4 className="truncate font-semibold text-[#241f1c]">
-                                {product.name}
-                              </h4>
-
-                              {product.category && (
-                                <p className="mt-1 text-xs text-[#958780]">
-                                  {product.category}
-                                </p>
+                              {/* Product Image */}
+                              {product.image ? (
+                                <img
+                                  src={product.image}
+                                  alt={product.name}
+                                  className="h-20 w-20 rounded-xl object-cover"
+                                />
+                              ) : (
+                                <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-[#f5efeb] text-2xl">
+                                  💄
+                                </div>
                               )}
 
-                              <p className="mt-2 text-sm text-[#756a64]">
-                                {product.quantity} ×{" "}
-                                {Number(product.price).toLocaleString()} ETB
+                              {/* Product Info */}
+                              <div className="min-w-0 flex-1">
+                                <h4 className="truncate font-semibold text-[#241f1c]">
+                                  {product.name}
+                                </h4>
+
+                                {product.category && (
+                                  <p className="mt-1 text-xs text-[#958780]">
+                                    {product.category}
+                                  </p>
+                                )}
+
+                                <p className="mt-2 text-sm text-[#756a64]">
+                                  {product.quantity} ×{" "}
+                                  {Number(
+                                    product.price
+                                  ).toLocaleString()}{" "}
+                                  ETB
+                                </p>
+                              </div>
+
+                              {/* Product Total */}
+                              <p className="font-bold text-[#8b6f61]">
+                                {(
+                                  Number(
+                                    product.price
+                                  ) *
+                                  product.quantity
+                                ).toLocaleString()}{" "}
+                                ETB
                               </p>
+
                             </div>
-
-                            <p className="font-bold text-[#8b6f61]">
-                              {(
-                                Number(product.price) *
-                                product.quantity
-                              ).toLocaleString()}{" "}
-                              ETB
-                            </p>
-
-                          </div>
-
-                        ))}
+                          )
+                        )}
                     </div>
 
                     {/* Order Details */}
                     <div className="mt-8 grid gap-6 border-t border-[#eee7e2] pt-7 md:grid-cols-2">
 
+                      {/* Delivery Information */}
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#a39187]">
                           Delivery Information
@@ -294,6 +317,7 @@ export default function MyOrdersPage() {
                         </p>
                       </div>
 
+                      {/* Total */}
                       <div className="md:text-right">
 
                         <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#a39187]">
@@ -307,6 +331,7 @@ export default function MyOrdersPage() {
                           ETB
                         </p>
 
+                        {/* Internal Reference */}
                         {order.tx_ref && (
                           <p className="mt-2 break-all text-xs text-[#a39791]">
                             Ref: {order.tx_ref}
